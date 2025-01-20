@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Or your database provider (e.g., mysql, sqlite)
+  url      = env("DATABASE_URL") // Replace with your database URL
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String
+  email    String   @unique
+  role     Role
+
+  signups  Signup[]
+}
+
+model Opportunity {
+  id               Int       @id @default(autoincrement())
+  title            String
+  description      String
+  location         String
+  date             DateTime
+  max_participants Int
+
+  signups          Signup[]
+}
+
+model Signup {
+  id             Int          @id @default(autoincrement())
+  opportunity    Opportunity  @relation(fields: [opportunityId], references: [id])
+  opportunityId  Int
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+  status         Status
+}
+
+enum Role {
+  ADMIN
+  VOLUNTEER
+}
+
+enum Status {
+  PENDING
+  CONFIRMED
+}
