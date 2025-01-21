@@ -14,19 +14,29 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// model Post {
+//     id        Int      @id @default(autoincrement())
+//     name      String
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+//     createdBy   User   @relation(fields: [createdById], references: [id])
+//     createdById String
 
-    @@index([name])
-}
+//     @@index([name])
+// }
 
 // Necessary for Next auth
+
+// model User {
+//     id            String    @id @default(cuid())
+//     name          String?
+//     email         String?   @unique
+//     emailVerified DateTime?
+//     image         String?
+//     posts         Post[]
+// }
+
 model Account {
     id                       String  @id @default(cuid())
     userId                   String
@@ -55,14 +65,43 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
+    id            String        @id @default(cuid())
+    name          String        @db.VarChar(100)
+    email         String        @unique
+    role          Role
+    signups       Signup[]
+    createdAt     DateTime      @default(now())
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    opportunities Opportunity[]
+
+    @@index([email])
+}
+
+model Opportunity {
+    id               String            @id @default(cuid())
+    userId           String
+    user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    title            String            @db.VarChar(100)
+    description      String?           @db.VarChar(255)
+    location         String?           @db.VarChar(100)
+    date             DateTime
+    max_participants Int
+    status           OpportunityStatus
+    signups          Signup[]
+    createdAt        DateTime          @default(now())
+
+    @@index([userId])
+}
+
+model Signup {
+    id            String      @id @default(cuid())
+    opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+    opportunityId String
+    user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId        String
+    status        Status
+    createdAt     DateTime    @default(now())
 }
 
 model VerificationToken {
@@ -71,4 +110,20 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+enum Role {
+    ADMIN
+    VOLUNTEER
+}
+
+enum Status {
+    PENDING
+    CONFIRMED
+    REJECTED
+}
+
+enum OpportunityStatus {
+    OPEN
+    CLOSED
 }
