@@ -46,6 +46,7 @@ model User {
     name          String        @db.VarChar(100)
     email         String        @unique
     role          Role
+    password      String
     signups       Signup[]
     createdAt     DateTime      @default(now())
     accounts      Account[]
