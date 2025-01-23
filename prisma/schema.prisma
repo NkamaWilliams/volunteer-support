@@ -52,6 +52,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     opportunities Opportunity[]
+    posts         Post[]  
 
     @@index([email])
 }
@@ -89,6 +90,16 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model Post {
+  id          Int      @id @default(autoincrement())  // Primary key
+  title       String
+  content     String?                                // Optional field
+  createdById String                                // Foreign key pointing to User model
+  createdBy   User     @relation(fields: [createdById], references: [id]) // Relation to User model
+  createdAt   DateTime @default(now())              // Automatically set the creation timestamp
+}
+
 
 enum Role {
     ADMIN
