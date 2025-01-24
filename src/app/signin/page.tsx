@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 export default function SignIn() {
   return (
@@ -34,8 +35,8 @@ export default function SignIn() {
           Sign In
         </button>
 
-        <p className="text-center text-gray-700 text-sm mt-4">
-          New to this platform? <a href="#" className="text-blue-600 hover:underline">Sign Up</a>
+        <p className="text-center text-gray-700 font-bold text-sm mt-4">
+          New to this platform? <Link href="/signup" className="text-blue-600 hover:underline">Sign Up</Link>
         </p>
       </div>
     </div>
