@@ -1,11 +1,4 @@
 const Footer = () => {
-    const paragraph = {
-      color: '#2093D6',
-      fontSize: '1rem',
-      textAlign: 'center',
-      background: '#F5F3F3',
-      padding: '0.2rem',
-    };
     
     return (
       <footer style={{ margin: '0', padding: '0.5rem', backgroundColor: '#f5f3f3' }}>
