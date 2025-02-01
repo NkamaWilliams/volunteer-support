@@ -29,7 +29,7 @@ export function SignUp(){
         createUser.mutate({
           name: `Williams${count}`,
           email: `will${count}@gmail.com`,
-          password: "liwl12345",
+          password: "pass12345",
           role: "VOLUNTEER"
         })
       }}>{createUser.isPending ? "Creating..." : "Create User"}</button>

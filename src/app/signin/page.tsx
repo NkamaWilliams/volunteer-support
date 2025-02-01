@@ -1,10 +1,23 @@
-"use client";
+"use client"
 import Link from "next/link";
+import { useFormState } from "react-dom";
+import { useEffect } from "react";
+import { loginAction } from "../_utils/login";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
+  const router = useRouter()
+  const [formState, formAction] = useFormState(loginAction, null);
+
+  useEffect(() => {
+    if (formState?.success){
+      router.push("/")
+    }
+  }, [formState, router])
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-800 to-blue-400">
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-sm mx-4">
+      <form action={formAction} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-sm mx-4">
         <h2 className="text-xl font-semibold text-center mb-4">Sign In Here</h2>
 
         <div className="mb-4">
@@ -14,6 +27,7 @@ export default function SignIn() {
           <input
             type="email"
             id="email"
+            name="email"
             placeholder="janedoe@gmail.com"
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -26,6 +40,7 @@ export default function SignIn() {
           <input
             type="password"
             id="password"
+            name="password"
             placeholder="Enter your password"
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -38,7 +53,12 @@ export default function SignIn() {
         <p className="text-center text-gray-700 font-bold text-sm mt-4">
           New to this platform? <Link href="/signup" className="text-blue-600 hover:underline">Sign Up</Link>
         </p>
-      </div>
+
+        {/* Display error message if login fails */}
+        {formState?.error && <p className="text-center text-red-500 font-semibold text-sm mt-1">
+          {formState.error}
+        </p>}
+      </form>
     </div>
   );
 }
