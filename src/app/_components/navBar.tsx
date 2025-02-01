@@ -13,9 +13,12 @@ const Navbar = () => {
       <Link href="/signup" className="hover:text-[#2093D6] text-black text-base">
       Sign up
       </Link>
+      <Link href="/createEvent" className="hover:text-[#2093D6] text-black text-base">
+      Create an Event
+      </Link>
     </nav>
   );
-};
+}; 
 
 export default Navbar;
 
