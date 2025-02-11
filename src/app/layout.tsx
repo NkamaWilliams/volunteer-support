@@ -24,9 +24,11 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          <Navbar/>
-          {children}
-          <Footer/>
+          <main className="flex flex-col min-h-screen">
+            <Navbar/>
+            {children}
+            <Footer/>
+          </main>
         </TRPCReactProvider>
       </body>
     </html>

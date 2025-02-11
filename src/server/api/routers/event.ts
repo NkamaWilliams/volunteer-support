@@ -1,6 +1,7 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { TRPCError } from "@trpc/server"
 import {z} from "zod"
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc"
 
 export const eventRouter = createTRPCRouter({
   createEvent: protectedProcedure.input(
@@ -40,6 +41,40 @@ export const eventRouter = createTRPCRouter({
     } catch (err) {
       console.log(err)
       throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Failed to create event!"})
+    }
+  }),
+
+  getEvent: publicProcedure.input(
+    z.object({
+      id: z.string()
+    })
+  ).query(async ({ctx, input}) => {
+    try{
+      const event = ctx.db.opportunity.findUniqueOrThrow({
+        where: {
+          id: input.id
+        },
+        include: {
+          signups: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          }
+        }
+      })
+      return event
+    } catch(err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code == "P2025") {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Event not found!" });
+      }
+      
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch event!" });
     }
   })
 })
