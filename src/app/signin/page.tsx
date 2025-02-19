@@ -1,13 +1,13 @@
 "use client"
 import Link from "next/link";
 import { useFormState } from "react-dom";
-import { useEffect } from "react";
+import { useEffect, useActionState } from "react";
 import { loginAction } from "../_utils/login";
 import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const router = useRouter()
-  const [formState, formAction] = useFormState(loginAction, null);
+  const [formState, formAction] = useActionState(loginAction, null);
 
   useEffect(() => {
     if (formState?.success){

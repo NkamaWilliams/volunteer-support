@@ -50,7 +50,7 @@ export const eventRouter = createTRPCRouter({
     })
   ).query(async ({ctx, input}) => {
     try{
-      const event = ctx.db.opportunity.findUniqueOrThrow({
+      const event = await ctx.db.opportunity.findUniqueOrThrow({
         where: {
           id: input.id
         },
@@ -75,6 +75,30 @@ export const eventRouter = createTRPCRouter({
       }
       
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch event!" });
+    }
+  }),
+
+  getMyEvents: publicProcedure.query(async ({ctx}) => {
+    try{
+      const userId = ctx.session?.user.id
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      }
+      const events = await ctx.db.opportunity.findMany({
+        where: {
+          userId
+        },
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          location: true,
+          status: true
+        }
+      });
+      return events
+    } catch(err) {
+      throw new TRPCError({code: "NOT_FOUND", message: "Unable to find user's events!"})
     }
   })
 })

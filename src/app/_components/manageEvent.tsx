@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { api } from "~/trpc/react";
-import Image from "next/image";
 
 const EventManagement = ({id} : {id: string}) => {
     const router = useRouter();
