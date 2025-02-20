@@ -14,6 +14,10 @@ interface Event {
 const Events = () => {
     const [events, setEvents] = useState<Event[]>([])
     const getEvents = api.event.getMyEvents.useQuery()
+    const parseDate = (date:Date) => {
+        const setDate = date
+        return `${setDate.getDate()}-${setDate.getMonth()}-${setDate.getFullYear()}`
+    }
 
     return(
         <div className="flex-1 flex flex-col space-y-6 rounded-lg bg-blue-400 h-full p-6 shadow-lg">
@@ -30,7 +34,7 @@ const Events = () => {
                         key={event.id}
                         eventId={event.id}
                         title={event.title} 
-                        date="11-12-2016" 
+                        date={parseDate(event.date)}
                         location={event.location ?? "Unknown Location"} 
                         status={event.status}
                         />

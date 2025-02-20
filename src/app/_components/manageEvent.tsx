@@ -58,19 +58,22 @@ const EventManagement = ({id} : {id: string}) => {
             </div>
             <div className="max-w-7xl mx-auto">
                 <h2 className="my-3 text-center text-3xl font-extrabold text-gray-800">{event?.title}</h2>
+                <div className="my-2 text-lg text-gray-700 max-w-7xl mx-auto">
+                    <span className="text-black font-semibold">Applicants:</span> {event?.signups.length}/{event?.max_participants}
+                </div>
                 <p className="text-lg text-gray-600">
                     <span className="text-black font-semibold">Location:</span> {event?.location}
                 </p>
-                <p className="text-lg mt-2 text-gray-700 bg-white min-h-20 p-2 rounded-md">
-                    <span className="block text-center font-semibold">Description</span>
-                    {event?.description}
-                </p>
-            </div>
-            <div className="my-2 text-lg text-gray-700 max-w-7xl mx-auto">
-                <span className="text-black font-semibold">Applicants:</span> {event?.signups.length}/{event?.max_participants}
+                <div className="flex gap-2">
+                    <p className="block text-center text-lg font-semibold">Description:</p>
+                    <p className=" flex-1 text-lg mt-2 text-gray-700 bg-white min-h-20 p-2 rounded-md">
+                        {event?.description}
+                    </p>
+
+                </div>
             </div>
             <div className="max-w-7xl mx-auto">
-                <h3 className="mb-3 text-xl text-center font-bold text-gray-900">Volunteers</h3>
+                <h3 className="my-3 text-xl text-center font-bold text-gray-900">Volunteers</h3>
                 {event?.signups.length === 0 ? (
                 <p className="text-gray-500">No volunteers yet.</p>
                 ) : (
