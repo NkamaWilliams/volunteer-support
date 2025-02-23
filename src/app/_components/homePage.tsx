@@ -1,3 +1,29 @@
+import type { Event } from "./eventList";
+import EventList from "./eventList";
+const eventData: Event[] = [
+  {
+    id: 1,
+    name: "Tech Conference 2025",
+    description: "A conference on AI and innovation.",
+    location: "New York",
+    applied: false,
+  },
+  {
+    id: 2,
+    name: "Web Dev Summit",
+    description: "Discussing the future of web technologies.",
+    location: "San Francisco",
+    applied: true,
+  },
+  {
+    id: 3,
+    name: "Blockchain Expo",
+    description: "Exploring the latest in blockchain development.",
+    location: "Berlin",
+    applied: false,
+  },
+];
+
 const Home = () => {
   return (
     <div className="flex flex-col justify-center items-center min-h-[85vh] bg-gradient-to-b from-blue-800 to-blue-400 text-white">
@@ -9,6 +35,7 @@ const Home = () => {
           Effectively manage and boost your productivity with our platform.
         </p>
       </section>
+      <EventList eventData={eventData}/>
     </div>
   );
 };
