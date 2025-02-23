@@ -41,7 +41,7 @@ interface EventListProps {
 
 const EventList: React.FC<EventListProps> = ({ eventData }) => {
   const [events, setEvents] = useState<Event[]>(eventData);
-  const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
   const toggleApply = (id: number) => {
     setEvents(
@@ -106,3 +106,4 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
 };
 
 export default EventList;
+export type {Event}

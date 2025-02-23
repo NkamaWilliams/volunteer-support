@@ -1,7 +1,7 @@
 'use client'
 import { EventList } from "../_components/list"
 import { api } from "~/trpc/react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 interface Event {
     status: string,
