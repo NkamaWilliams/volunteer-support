@@ -16,6 +16,12 @@ const Navbar = () => {
       <Link href="/createEvent" className="hover:text-[#2093D6] text-black text-base">
       Create an Event
       </Link>
+      <Link href="/allEvents" className="hover:text-[#2093D6] text-black text-base">
+      All Events
+      </Link>
+      <Link href="/acceptedEvents" className="hover:text-[#2093D6] text-black text-base">
+      Accepted Events
+      </Link>
     </nav>
   );
 }; 
