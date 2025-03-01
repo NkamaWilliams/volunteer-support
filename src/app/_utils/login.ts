@@ -1,6 +1,7 @@
 "use server"
 import { signIn } from "~/server/auth";
 import { AuthError } from "next-auth";
+import { TRPCError } from "@trpc/server";
 
 export async function loginAction(
   prevState: { success?: boolean; error?: string } | null, 
@@ -17,6 +18,8 @@ export async function loginAction(
   } catch(err) {
     if (err instanceof AuthError){
       console.log(err.message)
+    } else if (err instanceof TRPCError){
+      return {error: err.message}
     } else {
       console.log(err)
     }

@@ -3,17 +3,61 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { api } from "~/trpc/react";
+import { useMemo } from "react";
+import { Status } from "@prisma/client";
 
 const EventManagement = ({id} : {id: string}) => {
     const router = useRouter();
-  
+    
     const {data:event, isLoading, isFetched} = api.event.getEvent.useQuery(
       {
         id
       },
       // { enabled: !!id }
     )
-  
+    const accept = api.event.acceptApplication.useMutation({
+        onSuccess: res => {
+            const id = res.application.id
+            const status = res.application.status
+            if (event){
+                event.signups = event.signups.map(signup => {
+                    if (signup.id == id){
+                        signup.status = status
+                    }
+                    return signup
+                })
+            }
+        },
+        onError: err => {
+            alert(err.message)
+        }
+    })
+    const reject = api.event.rejectApplication.useMutation({
+        onSuccess: res => {
+            const id = res.application.id
+            const status = res.application.status
+            if (event){
+                event.signups = event.signups.map(signup => {
+                    if (signup.id == id){
+                        signup.status = status
+                    }
+                    return signup
+                })
+            }
+        },
+        onError: err => {
+            alert(err.message)
+        }
+    })
+    
+    const memoizedAccepted = useMemo(() => {
+        if (event){
+            return event.signups.filter(signup => signup.status == Status.CONFIRMED).length
+        }
+        else {
+            return 0;
+        }
+    }, [event])
     // useEffect(() => {
     //   if (event) {
     //     setVolunteers(event.signups || []);
@@ -22,10 +66,12 @@ const EventManagement = ({id} : {id: string}) => {
   
     const handleAccept = (id: string) => {
     //   setVolunteers(volunteers.filter((volunteer) => volunteer.id !== id));
+        accept.mutate({applicationId: id})
     };
   
     const handleReject = (id: string) => {
     //   setVolunteers(volunteers.filter((volunteer) => volunteer.id !== id));
+        reject.mutate({applicationId: id})
     };
   
     const handleDeleteEvent = () => {
@@ -59,17 +105,16 @@ const EventManagement = ({id} : {id: string}) => {
             <div className="max-w-7xl mx-auto">
                 <h2 className="my-3 text-center text-3xl font-extrabold text-gray-800">{event?.title}</h2>
                 <div className="my-2 text-lg text-gray-700 max-w-7xl mx-auto">
-                    <span className="text-black font-semibold">Applicants:</span> {event?.signups.length}/{event?.max_participants}
+                    <span className="text-black font-semibold">Applicants:</span> {memoizedAccepted}/{event?.max_participants}
                 </div>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-gray-900">
                     <span className="text-black font-semibold">Location:</span> {event?.location}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex mt-2 gap-2">
                     <p className="block text-center text-lg font-semibold">Description:</p>
-                    <p className=" flex-1 text-lg mt-2 text-gray-700 bg-white min-h-20 p-2 rounded-md">
+                    <p className=" flex-1 text-lg  rounded-md">
                         {event?.description}
                     </p>
-
                 </div>
             </div>
             <div className="max-w-7xl mx-auto">
@@ -86,20 +131,29 @@ const EventManagement = ({id} : {id: string}) => {
                         <span className="font-medium text-gray-800">
                         {volunteer.user.name}
                         </span>
-                        <div className="space-x-2">
-                        <button
-                            onClick={() => handleAccept(volunteer.userId)}
-                            className="rounded-md bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
-                        >
-                            Accept
-                        </button>
-                        <button
-                            onClick={() => handleReject(volunteer.userId)}
-                            className="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-red-700"
-                        >
-                            Reject
-                        </button>
-                        </div>
+                        {
+                            volunteer.status == Status.PENDING ?
+                            <div className="space-x-2">
+                                <button
+                                    onClick={() => handleAccept(volunteer.id)}
+                                    className="rounded-md bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
+                                >
+                                    Accept
+                                </button>
+                                <button
+                                    onClick={() => handleReject(volunteer.id)}
+                                    className="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                                >
+                                    Reject
+                                </button>
+                            </div> :
+                            <div>
+                                <p 
+                                className={`font-semibold ${volunteer.status == "CONFIRMED" ? "text-green-500" : "text-red-500"}`}>
+                                    {volunteer.status}
+                                </p>
+                            </div>
+                        }
                     </li>
                     ))}
                 </ul>

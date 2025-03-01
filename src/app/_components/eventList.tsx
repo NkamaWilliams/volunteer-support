@@ -1,13 +1,15 @@
 "use client";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
-import { useState } from "react";
+import { api } from "~/trpc/react";
+import { useState, useEffect } from "react";
 
 interface Event {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
+  id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  date?: Date;
   applied: boolean;
 }
 
@@ -41,19 +43,55 @@ interface EventListProps {
 
 const EventList: React.FC<EventListProps> = ({ eventData }) => {
   const [events, setEvents] = useState<Event[]>(eventData);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const apply = api.event.applyToEvent.useMutation({
+    onSuccess: (res) => {
+      console.log("Application successful")
+      updateApply(res.application.id)
+    },
+    onError: err => {
+      alert(err.message)
+    }
+  })
 
-  const toggleApply = (id: number) => {
+  const cancel = api.event.cancelApplication.useMutation({
+    onSuccess: (res) => {
+      console.log("Application cancelled successful")
+      updateApply(res.application.id)
+    },
+    onError: err => {
+      alert(err.message)
+    }
+  })
+
+  const updateApply = (id: string) => {
     setEvents(
       events.map((event) =>
         event.id === id ? { ...event, applied: !event.applied } : event,
       ),
     );
+  }
+
+  const handleApply = (id: string) => {
+    const event = eventData.find(val => val.id == id)
+    if (event?.applied){
+      cancel.mutate({id})
+    } else {
+      apply.mutate({id})
+    }
   };
 
-  const toggleDropdown = (id: number) => {
+  const toggleDropdown = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const parseDate = (date: Date) => {
+    return new Date(date).toISOString().split("T")[0]; // Returns YYYY-MM-DD
+  };
+
+  useEffect(() => {
+    setEvents(eventData); // 🔥 Fix: Sync with updated props
+  }, [eventData]);
 
   return (
     <div className="mx-auto mb-10 mt-10 w-[80%] space-y-4 border-2 border-blue-500 p-6">
@@ -64,7 +102,7 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
         >
           <div className="flex items-center justify-between">
             <h3 className="flex gap-3 text-lg font-semibold text-blue-700">
-              {event.name}
+              {event.title}
               <button
                 className="text-gray-500 transition hover:text-gray-700"
                 onClick={() => toggleDropdown(event.id)}
@@ -83,7 +121,7 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
                     ? "bg-red-500 hover:bg-red-600"
                     : "bg-blue-500 hover:bg-blue-600"
                 }`}
-                onClick={() => toggleApply(event.id)}
+                onClick={() => handleApply(event.id)}
               >
                 {event.applied ? "Cancel" : "Apply"}
               </button>
@@ -97,6 +135,9 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
               <p className="text-sm text-gray-700">
                 <strong>Location:</strong> {event.location}
               </p>
+              {event.date && <p className="text-sm text-gray-700">
+                <strong>Date:</strong> {parseDate(event.date)}
+              </p>}
             </div>
           )}
         </div>
