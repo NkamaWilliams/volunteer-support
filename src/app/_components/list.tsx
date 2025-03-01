@@ -9,10 +9,10 @@ const EventList = ({title, date, location, status, eventId} : {title: string, da
     return(
         <div onClick={handleClick} className="my-3 p-2 bg-slate-100 rounded hover:cursor-pointer hover:bg-slate-200">
             <div className="flex gap-2 items-center justify-between">
-                <p className="font-semibold text-xl">{title}</p>
+                <p className="font-semibold text-xl text-blue-700">{title}</p>
                 <p className={`w-4 aspect-square rounded-full ${status=="OPEN" ? "bg-green-500" : "bg-red-500"}`}></p>
             </div>
-            <div className="flex gap-2 items-center justify-between opacity-50">
+            <div className="flex gap-2 items-center justify-between">
                 <p className="text-base">{location}</p>
                 <p>{date}</p>
             </div>

@@ -2,7 +2,7 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-
+import { SessionProvider } from "next-auth/react";
 import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "./_components/navBar";
 import Footer from "./_components/footer";
@@ -23,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>
-          <main className="flex flex-col min-h-screen">
-            <Navbar/>
-            {children}
-            <Footer/>
-          </main>
-        </TRPCReactProvider>
+        <SessionProvider>
+          <TRPCReactProvider>
+            <main className="flex flex-col min-h-screen">
+              <Navbar/>
+              {children}
+              <Footer/>
+            </main>
+          </TRPCReactProvider>
+        </SessionProvider>
       </body>
     </html>
   );

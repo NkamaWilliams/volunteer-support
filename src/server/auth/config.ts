@@ -86,12 +86,14 @@ export const authConfig = {
       if (user){
         token.email = user.email
         token.sub = user.id
+        token.name = user.name
       }
       return token
     },
     async session({session, token}){
       session.user.id = token.sub ?? ""
       session.userId = token.sub ?? ""
+      session.user.name = token.name ?? ""
       return session
     }
   },
