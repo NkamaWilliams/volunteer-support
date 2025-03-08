@@ -28,16 +28,20 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href="/event" className="hover:text-[#2093D6] text-black text-base">
-              My Events
-              </Link>
               <Link href="/allEvents" className="hover:text-[#2093D6] text-black text-base">
               All Events
               </Link>
-              <Link href="/acceptedEvents" className="hover:text-[#2093D6] text-black text-base">
-              Accepted Events
-              </Link>
-              <button className="hover:text-[#2093D6] text-black text-base" onClick={() => signOut()}>Sign Out</button>
+              { session.user.role == "ADMIN" &&
+                <>
+                <Link href="/event" className="hover:text-[#2093D6] text-black text-base">
+                My Events
+                </Link>
+                </>
+              }
+                <Link href="/acceptedEvents" className="hover:text-[#2093D6] text-black text-base">
+                Accepted Events
+                </Link>
+              <button className="hover:text-[#2093D6] text-black text-base" onClick={() => signOut({redirectTo: "/"})}>Sign Out</button>
             </>
           )
         }

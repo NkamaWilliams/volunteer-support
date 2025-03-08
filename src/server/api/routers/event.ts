@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client"
+import { OpportunityStatus, Status } from "@prisma/client"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { TRPCError } from "@trpc/server"
 import {z} from "zod"
@@ -41,6 +41,9 @@ export const eventRouter = createTRPCRouter({
       return { success: true, event }
     } catch (err) {
       console.log(err)
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Failed to create event!"})
     }
   }),
@@ -74,7 +77,6 @@ export const eventRouter = createTRPCRouter({
       if (err instanceof PrismaClientKnownRequestError && err.code == "P2025") {
         throw new TRPCError({ code: "NOT_FOUND", message: "Event not found!" });
       }
-      
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch event!" });
     }
   }),
@@ -100,6 +102,9 @@ export const eventRouter = createTRPCRouter({
       });
       return events
     } catch(err) {
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({code: "NOT_FOUND", message: "Unable to find user's events!"})
     }
   }),
@@ -109,6 +114,9 @@ export const eventRouter = createTRPCRouter({
     try{
       const userId = ctx.session?.user?.id ?? null
       const events = await ctx.db.opportunity.findMany({
+        where: {
+          date: {gte: new Date()}
+        },
         select: {
           id: true,
           title: true,
@@ -130,6 +138,9 @@ export const eventRouter = createTRPCRouter({
 
       return formattedEvents
     } catch (err) {
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({code: "NOT_FOUND", message: "Unable to find any event"})
     }
   }),
@@ -168,7 +179,30 @@ export const eventRouter = createTRPCRouter({
       });
       return events
     } catch (err) {
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Something went wrong retrieving data from the database!"})
+    }
+  }),
+
+  getLatest: publicProcedure.query(async ({ctx}) => {
+    try {
+      const events = await ctx.db.opportunity.findMany({
+        take: 3,
+        orderBy: {createdAt: "desc"},
+        where: {
+          status: OpportunityStatus.OPEN
+        }
+      });
+
+      return events;
+    } catch (err) {
+      console.error(err);
+      if (err instanceof TRPCError){
+        throw err;
+      }
+      throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message:"An error occured retrieving latest events"});
     }
   }),
 
@@ -231,6 +265,9 @@ export const eventRouter = createTRPCRouter({
     }
     catch(err){
       console.error(err)
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Something went wrong while applying for the event.",
@@ -288,11 +325,14 @@ export const eventRouter = createTRPCRouter({
       return{
         success: true,
         message: "Removed application successfully",
-        application: eventExists
+        application: alreadyApplied
       }
     }
     catch(err) {
-      throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Unable to cancle application"})
+      if (err instanceof TRPCError){
+        throw err;
+      }
+      throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Unable to cancel application"})
     }
   }),
 
@@ -347,6 +387,9 @@ export const eventRouter = createTRPCRouter({
       };
     } catch (err) {
       console.error(err);
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to accept application" });
     }
   }),
@@ -394,6 +437,9 @@ export const eventRouter = createTRPCRouter({
     }
     catch(err){
       console.error(err)
+      if (err instanceof TRPCError){
+        throw err;
+      }
       throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "Failed to reject application"})
     }
   })

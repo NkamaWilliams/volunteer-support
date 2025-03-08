@@ -79,7 +79,7 @@ const EventManagement = ({id} : {id: string}) => {
     };
     // bg-gradient-to-b from-blue-800 to-blue-400
     return (
-      <div className="flex-1 space-y-6 rounded-lg bg-blue-400  p-6 shadow-lg">
+      <div className="flex-1 space-y-6 rounded-lg bg-gradient-to-b from-blue-800 to-blue-400 text-white  p-6 shadow-lg">
         {
           isFetched &&
           <div>
@@ -95,12 +95,12 @@ const EventManagement = ({id} : {id: string}) => {
                 <h1 className="text-2xl font-bold text-gray-900">Manage Event</h1>
                 </div>
     
-                <button
+                {/* <button
                 onClick={handleDeleteEvent}
                 className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                 >
                 Delete Event
-                </button>
+                </button> */}
             </div>
             <div className="max-w-7xl mx-auto">
                 <h2 className="my-3 text-center text-3xl font-extrabold text-gray-800">{event?.title}</h2>
