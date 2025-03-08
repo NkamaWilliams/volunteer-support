@@ -3,6 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import * as bcrypt from "bcrypt";
 import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "~/server/db";
+import { type AdapterUser } from "@auth/core/adapters";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -15,14 +16,15 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role?: string;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User extends AdapterUser {
+    // ...other properties
+    role?: string;
+    emailVerified: Date| null
+  }
 }
 
 /**
@@ -61,7 +63,13 @@ export const authConfig = {
           // const validPassword = password == myuser.password
           if (validPassword){
             console.log("Login Successful")
-            return myuser
+            return {
+              id: myuser.id,
+              name: myuser.name,
+              emailVerified: null,
+              email: myuser.email,
+              role: myuser.role.toString()
+            }
           }
           return null
         } catch {
@@ -87,6 +95,7 @@ export const authConfig = {
         token.email = user.email
         token.sub = user.id
         token.name = user.name
+        token.role = user.role
       }
       return token
     },
@@ -94,6 +103,7 @@ export const authConfig = {
       session.user.id = token.sub ?? ""
       session.userId = token.sub ?? ""
       session.user.name = token.name ?? ""
+      session.user.role = typeof token.role === "string" ? token.role : "";
       return session
     }
   },

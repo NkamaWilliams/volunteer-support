@@ -1,16 +1,18 @@
 "use client"
 import Link from "next/link";
-import { useFormState } from "react-dom";
 import { useEffect, useActionState } from "react";
 import { loginAction } from "../_utils/login";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function SignIn() {
   const router = useRouter()
   const [formState, formAction] = useActionState(loginAction, null);
+  const { update } = useSession() 
 
   useEffect(() => {
     if (formState?.success){
+      update().then(() => console.log("Updated Successfully")).catch(err => console.error(err));
       router.push("/")
     }
   }, [formState, router])

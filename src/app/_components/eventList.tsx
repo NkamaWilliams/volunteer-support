@@ -10,7 +10,7 @@ interface Event {
   description: string | null;
   location: string | null;
   date?: Date;
-  applied: boolean;
+  applied?: boolean;
 }
 
 interface EventListProps {
@@ -44,10 +44,11 @@ interface EventListProps {
 const EventList: React.FC<EventListProps> = ({ eventData }) => {
   const [events, setEvents] = useState<Event[]>(eventData);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const trpcUtils = api.useUtils();
   const apply = api.event.applyToEvent.useMutation({
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       console.log("Application successful")
-      updateApply(res.application.id)
+      await trpcUtils.event.invalidate()
     },
     onError: err => {
       alert(err.message)
@@ -55,9 +56,9 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
   })
 
   const cancel = api.event.cancelApplication.useMutation({
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       console.log("Application cancelled successful")
-      updateApply(res.application.id)
+      await trpcUtils.event.invalidate()
     },
     onError: err => {
       alert(err.message)
@@ -94,7 +95,7 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
   }, [eventData]);
 
   return (
-    <div className="mx-auto mb-10 mt-10 w-[80%] space-y-4 border-2 border-blue-500 p-6">
+    <div className="mx-auto mb-10 mt-10 w-full max-w-7xl space-y-4 border-2 border-blue-500 p-6">
       {events.map((event) => (
         <div
           key={event.id}
@@ -115,16 +116,18 @@ const EventList: React.FC<EventListProps> = ({ eventData }) => {
               </button>
             </h3>
             <div className="flex">
-              <button
-                className={`rounded-md px-4 py-2 text-sm font-medium text-white transition ${
-                  event.applied
-                    ? "bg-red-500 hover:bg-red-600"
-                    : "bg-blue-500 hover:bg-blue-600"
-                }`}
-                onClick={() => handleApply(event.id)}
-              >
-                {event.applied ? "Cancel" : "Apply"}
-              </button>
+              {event.applied != undefined && 
+                <button
+                  className={`rounded-md px-4 py-2 text-sm font-medium text-white transition ${
+                    event.applied
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-500 hover:bg-blue-600"
+                  }`}
+                  onClick={() => handleApply(event.id)}
+                >
+                  {event.applied ? "Cancel" : "Apply"}
+                </button>
+              }
             </div>
           </div>
           {expanded[event.id] && (
