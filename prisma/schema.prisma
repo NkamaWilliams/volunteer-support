@@ -13,13 +13,6 @@ datasource db {
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
-model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
 model User {
     id            String        @id @default(cuid())
@@ -29,7 +22,6 @@ model User {
     password      String
     signups       Signup[]
     createdAt     DateTime      @default(now())
-    sessions      Session[]
     opportunities Opportunity[]
 
     @@index([email])
